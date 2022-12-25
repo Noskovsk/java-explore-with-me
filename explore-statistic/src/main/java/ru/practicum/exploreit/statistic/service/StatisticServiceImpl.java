@@ -20,7 +20,7 @@ public class StatisticServiceImpl implements StatisticService {
     @Override
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, ArrayList<String> uris, boolean unique) {
         log.info("Получен запрос на поиск статистики. Параметры: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
-        return statisticRepository.getCountEndpointsHits(uris, start, end);
+        return unique ? statisticRepository.getDistinctCountEndpointsHits(uris, start, end) : statisticRepository.getCountEndpointsHits(uris, start, end);
     }
 
     @Override
