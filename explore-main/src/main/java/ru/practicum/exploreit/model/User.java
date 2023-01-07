@@ -1,4 +1,4 @@
-package ru.practicum.exploreit.user.model;
+package ru.practicum.exploreit.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
@@ -21,9 +21,17 @@ public class User {
 
     @Override
     public boolean equals(Object o) {
+        //System.out.println("EQUALS");
+        //System.out.println((o instanceof User));
+        //System.out.println(o.getClass());
+        //System.out.println("this == o ");
+        //System.out.println(this == o);
         if (this == o) return true;
         if (!(o instanceof User)) return false;
         User user = (User) o;
+        //System.out.println("email " + email);
+        //System.out.println("user.email" + user.email);
+        //System.out.println(email.equals(user.email));
         return email.equals(user.email);
     }
 
