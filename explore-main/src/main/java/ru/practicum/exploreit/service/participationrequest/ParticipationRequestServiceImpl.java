@@ -60,7 +60,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             log.error("Запрашивать информацию может только инициатор события! userid={}, eventId={}", userId, eventId);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Запрашивать информацию может только инициатор события!");
         }
-        return partRequestRepository.findAllByEvent(event).stream().map(part -> ParticipationMapper.toParticipationRequestDto(part)).collect(Collectors.toList());
+        return partRequestRepository.findAllByEvent(event).stream().map(ParticipationMapper::toParticipationRequestDto).collect(Collectors.toList());
     }
 
     @Override
@@ -93,7 +93,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     @Override
     public List<ParticipationRequestDto> getUserRequests(Long userId) {
-        return partRequestRepository.findAllByRequesterId(userId).stream().map(p -> ParticipationMapper.toParticipationRequestDto(p)).collect(Collectors.toList());
+        return partRequestRepository.findAllByRequesterId(userId).stream().map(ParticipationMapper::toParticipationRequestDto).collect(Collectors.toList());
     }
 
     @Override
@@ -113,7 +113,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Акцептовать заявки может только инициатор события!");
         }
         ParticipationRequest participationRequest = getPartRequest(reqId);
-        if (participationRequest.getEvent().getId() != eventId) {
+        if (participationRequest.getEvent().getId().equals(eventId)) {
             log.info("Событие не относится к запросу. id запроса = {}, id события  = {}, id пользователя = {}", reqId, eventId, userId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Событие не относится к запросу.");
         }
@@ -129,8 +129,8 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 countApproved++;
                 if (countApproved == event.getParticipantLimit()) {
                     List<ParticipationRequest> participationRequestList = partRequestRepository.findAllByEventAndStatusNot(event, RequestStatus.CONFIRMED);
-                    participationRequestList.stream().forEach(pR -> pR.setStatus(RequestStatus.REJECTED));
-                    participationRequestList.stream().forEach(pR -> partRequestRepository.save(pR));
+                    participationRequestList.forEach(pR -> pR.setStatus(RequestStatus.REJECTED));
+                    partRequestRepository.saveAll(participationRequestList);
                 }
                 return ParticipationMapper.toParticipationRequestDto(participationRequest);
             } else {
