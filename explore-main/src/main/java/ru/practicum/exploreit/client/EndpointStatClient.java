@@ -25,7 +25,7 @@ public class EndpointStatClient {
     private static final String uriHead = "/events/";
     private static final LocalDateTime startSearchStat = LocalDateTime.of(2020, 01, 01, 00, 00);
     private static final LocalDateTime endSearchStat = LocalDateTime.of(2099, 01, 01, 00, 00);
-    private final String APP = "app";
+    private static final String APP = "app";
     @Value("${exploreit-stat-server.url}")
     private String serverUrl;
 
