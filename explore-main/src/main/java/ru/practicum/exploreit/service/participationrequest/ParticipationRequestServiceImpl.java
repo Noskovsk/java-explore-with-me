@@ -113,7 +113,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Акцептовать заявки может только инициатор события!");
         }
         ParticipationRequest participationRequest = getPartRequest(reqId);
-        if (participationRequest.getEvent().getId().equals(eventId)) {
+        if (!participationRequest.getEvent().getId().equals(eventId)) {
             log.info("Событие не относится к запросу. id запроса = {}, id события  = {}, id пользователя = {}", reqId, eventId, userId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Событие не относится к запросу.");
         }
