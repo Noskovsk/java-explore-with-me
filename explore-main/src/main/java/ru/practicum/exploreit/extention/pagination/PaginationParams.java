@@ -3,8 +3,7 @@ package ru.practicum.exploreit.extention.pagination;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.exploreit.exception.BadRequestException;
 
 @Slf4j
 public class PaginationParams {
@@ -23,7 +22,7 @@ public class PaginationParams {
     public static Integer validateFrom(Integer from) {
         if (from != null && from < 0) {
             log.error("Неверные параметры пагинации. from {}", from);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Неверные параметры пагинации.");
+            throw new BadRequestException("Неверные параметры пагинации.");
         }
         if (from == null) {
             from = 0;
@@ -34,7 +33,7 @@ public class PaginationParams {
     public static Integer validateSize(Integer size) {
         if (size != null && size <= 0) {
             log.error("Неверные параметры пагинации. size {}", size);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Неверные параметры пагинации.");
+            throw new BadRequestException("Неверные параметры пагинации.");
         }
         if (size == null) {
             size = Integer.MAX_VALUE;

@@ -11,7 +11,7 @@ import ru.practicum.exploreit.model.Category;
 import ru.practicum.exploreit.model.Compilation;
 import ru.practicum.exploreit.service.category.CategoryService;
 import ru.practicum.exploreit.service.compilation.CompilationServiceImpl;
-import ru.practicum.exploreit.service.event.EventServiceImpl;
+import ru.practicum.exploreit.service.event.EventService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -22,7 +22,7 @@ import java.util.List;
 public class PublicController {
     private final CategoryService categoryService;
     private final CompilationServiceImpl compilationService;
-    private final EventServiceImpl eventService;
+    private final EventService eventService;
 
     @GetMapping("categories")
     public List<Category> listCategories(@RequestParam(required = false) Integer from,
@@ -49,7 +49,7 @@ public class PublicController {
 
     @GetMapping("/events/{eventId}")
     public EventFullDto getEventInfo(@PathVariable Long eventId, HttpServletRequest request) throws InterruptedException {
-        return eventService.getEventInfo(eventId, request);
+        return eventService.getEventInfo(eventId, request.getRequestURI(), request.getRemoteAddr());
     }
 
     @GetMapping("/events")
@@ -63,6 +63,7 @@ public class PublicController {
                                                 @RequestParam(required = false) String sort,
                                                 @RequestParam(required = false) Integer from,
                                                 @RequestParam(required = false, defaultValue = "10") Integer size) {
-        return eventService.getEventsByFilter(request, text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        return eventService.getEventsByFilter(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request.getRequestURI(), request.getRemoteAddr());
+
     }
 }

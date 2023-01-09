@@ -2,14 +2,14 @@ package ru.practicum.exploreit.service.participationrequest;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.exploreit.dto.ParticipationMapper;
 import ru.practicum.exploreit.dto.ParticipationRequestDto;
+import ru.practicum.exploreit.exception.BadRequestException;
+import ru.practicum.exploreit.exception.ObjectNotFoundException;
 import ru.practicum.exploreit.model.*;
 import ru.practicum.exploreit.repository.PartRequestRepository;
-import ru.practicum.exploreit.service.event.EventServiceImpl;
+import ru.practicum.exploreit.service.event.EventService;
 import ru.practicum.exploreit.service.user.UserService;
 
 import java.time.LocalDateTime;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ParticipationRequestServiceImpl implements ParticipationRequestService {
     private final PartRequestRepository partRequestRepository;
-    private final EventServiceImpl eventService;
+    private final EventService eventService;
     private final UserService userService;
 
     @Override
@@ -32,16 +32,16 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         Event event = eventService.getEventById(eventId);
         if (user.equals(event.getInitiator())) {
             log.error("Инициатор события не может добавить запрос на участие в своём событии! userid={}, eventId={}", userId, eventId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Инициатор события не может добавить запрос на участие в своём событии!");
+            throw new BadRequestException("Инициатор события не может добавить запрос на участие в своём событии!");
         }
         if (!event.getState().equals(EventStatus.PUBLISHED)) {
             log.error("Нельзя участвовать в неопубликованном событии! userid={}, eventId={}", userId, eventId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Нельзя участвовать в неопубликованном событии!");
+            throw new BadRequestException("Нельзя участвовать в неопубликованном событии!");
         }
         int countActiveRequests = partRequestRepository.findAllByEventAndStatusNotIn(event, List.of(RequestStatus.CANCELED, RequestStatus.REJECTED)).size();
         if (event.getParticipantLimit() > 0 && countActiveRequests >= event.getParticipantLimit()) {
             log.error("Достигнут лимит по количеству участников в событии eventId={}! userid={}", eventId, userId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Достигнут лимит по количеству участников в событии!");
+            throw new BadRequestException("Достигнут лимит по количеству участников в событии!");
         }
         ParticipationRequest pr = new ParticipationRequest();
         pr.setCreated(LocalDateTime.now());
@@ -58,7 +58,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         Event event = eventService.getEventById(eventId);
         if (!user.equals(event.getInitiator())) {
             log.error("Запрашивать информацию может только инициатор события! userid={}, eventId={}", userId, eventId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Запрашивать информацию может только инициатор события!");
+            throw new BadRequestException("Запрашивать информацию может только инициатор события!");
         }
         return partRequestRepository.findAllByEvent(event).stream().map(ParticipationMapper::toParticipationRequestDto).collect(Collectors.toList());
     }
@@ -70,11 +70,11 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         User user = userService.getUser(userId);
         if (!participationRequest.getRequester().equals(user)) {
             log.error("Отменить запрос может только инициатор запроса! userid={}, requestId={}", userId, requestId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Отменить запрос может только инициатор запроса!");
+            throw new BadRequestException("Отменить запрос может только инициатор запроса!");
         }
         if (!participationRequest.getStatus().equals(RequestStatus.PENDING)) {
             log.error("Отклонять заявку можно только из статуса PENDING! userid={}, requestId={}", userId, requestId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Отклонять заявку можно только из статуса PENDING!");
+            throw new BadRequestException("Отклонять заявку можно только из статуса PENDING!");
         }
         participationRequest.setStatus(RequestStatus.CANCELED);
         return ParticipationMapper.toParticipationRequestDto(partRequestRepository.save(participationRequest));
@@ -85,7 +85,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         Optional<ParticipationRequest> requestOptional = partRequestRepository.findById(requestId);
         if (requestOptional.isEmpty()) {
             log.error("Ошибка при поиске запроса на участие requestId: {}", requestId);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ошибка при поиске события!");
+            throw new ObjectNotFoundException("Ошибка при поиске события!");
         } else {
             return requestOptional.get();
         }
@@ -110,16 +110,16 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
         if (!user.equals(event.getInitiator())) {
             log.error("Акцептовать заявки может только инициатор события! userid={}, eventId={}", userId, eventId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Акцептовать заявки может только инициатор события!");
+            throw new BadRequestException("Акцептовать заявки может только инициатор события!");
         }
         ParticipationRequest participationRequest = getPartRequest(reqId);
         if (!participationRequest.getEvent().getId().equals(eventId)) {
             log.info("Событие не относится к запросу. id запроса = {}, id события  = {}, id пользователя = {}", reqId, eventId, userId);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Событие не относится к запросу.");
+            throw new BadRequestException("Событие не относится к запросу.");
         }
         if (!participationRequest.getStatus().equals(RequestStatus.PENDING)) {
             log.error("Подтвердить заявку можно только из статуса PENDING! id запроса = {}, id события  = {}, id пользователя = {}", reqId, eventId, userId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Подтвердить заявку можно только из статуса PENDING!");
+            throw new BadRequestException("Подтвердить заявку можно только из статуса PENDING!");
         }
         if (event.getParticipantLimit() > 0) {
             int countApproved = partRequestRepository.findAllByEventAndStatus(event, RequestStatus.CONFIRMED).size();
@@ -135,7 +135,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 return ParticipationMapper.toParticipationRequestDto(participationRequest);
             } else {
                 log.error("Достигнут лимит по количеству участников в событии eventId={}! userid={}", eventId, userId);
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "остигнут лимит по количеству участников в событии!");
+                throw new BadRequestException("Достигнут лимит по количеству участников в событии!");
             }
         } else {
             participationRequest.setStatus(RequestStatus.CONFIRMED);
@@ -149,13 +149,13 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         ParticipationRequest participationRequest = getPartRequest(reqId);
         if (!participationRequest.getStatus().equals(RequestStatus.PENDING)) {
             log.error("Отклонять заявку можно только из статуса PENDING! userid={}, requestId={}", userId, reqId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Отклонять заявку можно только из статуса PENDING!");
+            throw new BadRequestException("Отклонять заявку можно только из статуса PENDING!");
         }
         User user = userService.getUser(userId);
         Event event = eventService.getEventById(eventId);
         if (!user.equals(event.getInitiator())) {
             log.error("Отклонять заявки может только инициатор события! userid={}, eventId={}", userId, eventId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Отклонять заявки может только инициатор события!");
+            throw new BadRequestException("Отклонять заявки может только инициатор события!");
         }
         participationRequest.setStatus(RequestStatus.REJECTED);
         return ParticipationMapper.toParticipationRequestDto(partRequestRepository.save(participationRequest));

@@ -3,11 +3,10 @@ package ru.practicum.exploreit.service.user;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.exploreit.dto.user.UserDto;
 import ru.practicum.exploreit.dto.user.UserMapper;
+import ru.practicum.exploreit.exception.ObjectNotFoundException;
 import ru.practicum.exploreit.extention.pagination.PaginationParams;
 import ru.practicum.exploreit.model.User;
 import ru.practicum.exploreit.repository.UserRepository;
@@ -51,7 +50,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
             log.error("Ошибка при поиске пользователя с userId: {}", userId);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ошибка при поиске пользователя!");
+            throw new ObjectNotFoundException("Ошибка при поиске пользователя!");
         } else {
             return userOptional.get();
         }

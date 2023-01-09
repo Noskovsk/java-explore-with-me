@@ -8,11 +8,11 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.exploreit.exception.StatFindException;
+import ru.practicum.exploreit.exception.StatPushException;
 import ru.practicum.exploreit.model.EndpointHit;
 import ru.practicum.exploreit.model.EndpointStat;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,14 +29,14 @@ public class EndpointStatClient {
     @Value("${exploreit-stat-server.url}")
     private String serverUrl;
 
-    public void sendHit(HttpServletRequest request) {
-        EndpointHit endpointHit = new EndpointHit(APP, request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
+    public void sendHit(String uri, String ip) {
+        EndpointHit endpointHit = new EndpointHit(APP, uri, ip, LocalDateTime.now());
         HttpEntity entity = new HttpEntity(endpointHit, createHeaders());
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> responseEntity = restTemplate.exchange(serverUrl + "/hit", HttpMethod.POST, entity, String.class);
         if (responseEntity.getStatusCodeValue() != 200) {
             log.error("Ошибка при попытке записи в статистику!");
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка при попытке записи в статистику!");
+            throw new StatPushException("Ошибка при попытке записи в статистику!");
         }
     }
 
@@ -71,7 +71,7 @@ public class EndpointStatClient {
             }
         } catch (HttpStatusCodeException e) {
             log.error("Ошибка при попытке поиска статистики!" + e.getStatusCode() + " " + e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка при попытке поиска статистики!");
+            throw new StatFindException("Ошибка при попытке поиска статистики!");
         }
 
     }

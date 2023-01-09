@@ -7,7 +7,7 @@ import ru.practicum.exploreit.dto.event.EventFullDto;
 import ru.practicum.exploreit.dto.event.EventNewDto;
 import ru.practicum.exploreit.dto.event.EventShortDto;
 import ru.practicum.exploreit.dto.event.EventUpdateDto;
-import ru.practicum.exploreit.service.event.EventServiceImpl;
+import ru.practicum.exploreit.service.event.EventService;
 import ru.practicum.exploreit.service.participationrequest.ParticipationRequestServiceImpl;
 
 import javax.validation.Valid;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping(path = "users/{userId}")
 @AllArgsConstructor
 public class PrivateController {
-    private final EventServiceImpl eventService;
+    private final EventService eventService;
     private final ParticipationRequestServiceImpl participationRequestService;
 
     @PostMapping("/events")

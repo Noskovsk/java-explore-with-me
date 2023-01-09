@@ -12,8 +12,8 @@ import ru.practicum.exploreit.model.Compilation;
 import ru.practicum.exploreit.model.EventStatus;
 import ru.practicum.exploreit.model.User;
 import ru.practicum.exploreit.service.category.CategoryService;
-import ru.practicum.exploreit.service.compilation.CompilationServiceImpl;
-import ru.practicum.exploreit.service.event.EventServiceImpl;
+import ru.practicum.exploreit.service.compilation.CompilationService;
+import ru.practicum.exploreit.service.event.EventService;
 import ru.practicum.exploreit.service.user.UserService;
 
 import javax.validation.Valid;
@@ -26,8 +26,8 @@ import java.util.List;
 public class AdminController {
     private final CategoryService categoryService;
     private final UserService userService;
-    private final EventServiceImpl eventService;
-    private final CompilationServiceImpl compilationService;
+    private final EventService eventService;
+    private final CompilationService compilationService;
 
     @PostMapping("/categories")
     public Category createCategory(@RequestBody @Valid Category category) {

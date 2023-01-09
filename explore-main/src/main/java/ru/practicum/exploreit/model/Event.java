@@ -7,9 +7,12 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
+import org.hibernate.validator.constraints.Length;
 import ru.practicum.exploreit.extention.PostgreSQLEnumType;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -26,8 +29,14 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank
+    @Length(min = 1, max = 120)
     private String title;
+    @NotBlank
+    @Length(min = 1, max = 2000)
     private String annotation;
+    @NotBlank
+    @Length(min = 1, max = 7000)
     private String description;
     @Column(name = "event_date", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -49,6 +58,7 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "location_id")
     private Location location;
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;

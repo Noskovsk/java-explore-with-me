@@ -15,4 +15,16 @@ public class ErrorHandler {
     public Map<String, String> handle(final DataIntegrityViolationException e) {
         return Map.of("error", "Data conflict: " + e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handle(final ObjectNotFoundException e) {
+        return Map.of("error", "Object not found: " + e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handle(final BadRequestException e) {
+        return Map.of("error", "Object not found: " + e.getMessage());
+    }
 }
