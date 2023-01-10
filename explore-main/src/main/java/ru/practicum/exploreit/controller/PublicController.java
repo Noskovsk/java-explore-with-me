@@ -66,4 +66,5 @@ public class PublicController {
         return eventService.getEventsByFilter(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request.getRequestURI(), request.getRemoteAddr());
 
     }
+
 }

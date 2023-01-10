@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.exploreit.dto.user.UserDto;
 import ru.practicum.exploreit.dto.user.UserMapper;
-import ru.practicum.exploreit.exception.ObjectNotFoundException;
+import ru.practicum.exploreit.exception.ErrorDataHandlingException;
 import ru.practicum.exploreit.extention.pagination.PaginationParams;
 import ru.practicum.exploreit.model.User;
 import ru.practicum.exploreit.repository.UserRepository;
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
             log.error("Ошибка при поиске пользователя с userId: {}", userId);
-            throw new ObjectNotFoundException("Ошибка при поиске пользователя!");
+            throw new ErrorDataHandlingException("Ошибка при поиске пользователя!");
         } else {
             return userOptional.get();
         }

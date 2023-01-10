@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.practicum.exploreit.exception.ObjectNotFoundException;
+import ru.practicum.exploreit.exception.ErrorDataHandlingException;
 import ru.practicum.exploreit.extention.pagination.PaginationParams;
 import ru.practicum.exploreit.model.Category;
 import ru.practicum.exploreit.repository.CategoryRepository;
@@ -31,7 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
         Optional<Category> categoryOptional = categoryRepository.findById(catId);
         if (categoryOptional.isEmpty()) {
             log.error("Ошибка при поиске категории с catId: {}", catId);
-            throw new ObjectNotFoundException("Ошибка при поиске пользователя!");
+            throw new ErrorDataHandlingException("Ошибка при поиске пользователя!");
         } else {
             return categoryOptional.get();
         }

@@ -18,13 +18,19 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handle(final ObjectNotFoundException e) {
-        return Map.of("error", "Object not found: " + e.getMessage());
+    public Map<String, String> handle(final ErrorDataHandlingException e) {
+        return Map.of("error", "Error data handling: " + e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handle(final BadRequestException e) {
-        return Map.of("error", "Object not found: " + e.getMessage());
+        return Map.of("error", "Bad request: " + e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Map<String, String> handle(final ForbiddenActionException e) {
+        return Map.of("error", "Forbidden: " + e.getMessage());
     }
 }

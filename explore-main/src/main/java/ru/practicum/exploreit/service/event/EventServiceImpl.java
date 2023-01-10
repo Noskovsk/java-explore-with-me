@@ -3,13 +3,12 @@ package ru.practicum.exploreit.service.event;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.exploreit.client.EndpointStatClient;
 import ru.practicum.exploreit.dto.event.*;
 import ru.practicum.exploreit.exception.BadRequestException;
-import ru.practicum.exploreit.exception.ObjectNotFoundException;
+import ru.practicum.exploreit.exception.ErrorDataHandlingException;
+import ru.practicum.exploreit.exception.ForbiddenActionException;
 import ru.practicum.exploreit.extention.pagination.PaginationParams;
 import ru.practicum.exploreit.model.*;
 import ru.practicum.exploreit.repository.EventRepository;
@@ -102,7 +101,7 @@ public class EventServiceImpl implements EventService {
             return crateFullEvent(event);
         } else {
             log.error("Доступ к события чужих пользователей запрещен! userid={}, eventId={}", userId, eventId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Доступ к события чужих пользователей запрещен!");
+            throw new ForbiddenActionException("Доступ к события чужих пользователей запрещен!");
         }
 
     }
@@ -112,7 +111,7 @@ public class EventServiceImpl implements EventService {
         Optional<Event> eventOptional = eventRepository.findById(eventId);
         if (eventOptional.isEmpty()) {
             log.error("Ошибка при поиске события с eventId: {}", eventId);
-            throw new ObjectNotFoundException("Ошибка при поиске события!");
+            throw new ErrorDataHandlingException("Ошибка при поиске события!");
         } else {
             return eventOptional.get();
         }
@@ -158,7 +157,7 @@ public class EventServiceImpl implements EventService {
         Event event = getEventById(eventId);
         if (!event.getInitiator().equals(userService.getUser(userId))) {
             log.error("Доступ к события чужих пользователей запрещен! userid={}, eventId={}", userId, eventId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Доступ к события чужих пользователей запрещен!");
+            throw new ForbiddenActionException("Доступ к события чужих пользователей запрещен!");
         }
         if (!event.getState().equals(EventStatus.PENDING)) {
             log.error("Невозможно отклонить опобликованную публикацию!");
@@ -212,7 +211,7 @@ public class EventServiceImpl implements EventService {
         Event oldEvent = getEventById(eventUpdateDto.getEventId());
         if (!oldEvent.getInitiator().equals(userService.getUser(userId))) {
             log.error("Доступ к события чужих пользователей запрещен! userid={}, eventId={}", userId, eventUpdateDto.getEventId());
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Доступ к события чужих пользователей запрещен!");
+            throw new ForbiddenActionException("Доступ к события чужих пользователей запрещен!");
         }
         if (oldEvent.getState().equals(EventStatus.PUBLISHED)) {
             log.error("Редактировать возможно только события кторые не подтверждены!");

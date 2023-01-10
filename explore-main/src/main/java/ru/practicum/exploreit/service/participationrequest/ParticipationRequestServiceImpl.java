@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.practicum.exploreit.dto.ParticipationMapper;
 import ru.practicum.exploreit.dto.ParticipationRequestDto;
 import ru.practicum.exploreit.exception.BadRequestException;
-import ru.practicum.exploreit.exception.ObjectNotFoundException;
+import ru.practicum.exploreit.exception.ErrorDataHandlingException;
+import ru.practicum.exploreit.exception.ForbiddenActionException;
 import ru.practicum.exploreit.model.*;
 import ru.practicum.exploreit.repository.PartRequestRepository;
 import ru.practicum.exploreit.service.event.EventService;
@@ -58,7 +59,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         Event event = eventService.getEventById(eventId);
         if (!user.equals(event.getInitiator())) {
             log.error("Запрашивать информацию может только инициатор события! userid={}, eventId={}", userId, eventId);
-            throw new BadRequestException("Запрашивать информацию может только инициатор события!");
+            throw new ForbiddenActionException("Запрашивать информацию может только инициатор события!");
         }
         return partRequestRepository.findAllByEvent(event).stream().map(ParticipationMapper::toParticipationRequestDto).collect(Collectors.toList());
     }
@@ -70,7 +71,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         User user = userService.getUser(userId);
         if (!participationRequest.getRequester().equals(user)) {
             log.error("Отменить запрос может только инициатор запроса! userid={}, requestId={}", userId, requestId);
-            throw new BadRequestException("Отменить запрос может только инициатор запроса!");
+            throw new ForbiddenActionException("Отменить запрос может только инициатор запроса!");
         }
         if (!participationRequest.getStatus().equals(RequestStatus.PENDING)) {
             log.error("Отклонять заявку можно только из статуса PENDING! userid={}, requestId={}", userId, requestId);
@@ -85,7 +86,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         Optional<ParticipationRequest> requestOptional = partRequestRepository.findById(requestId);
         if (requestOptional.isEmpty()) {
             log.error("Ошибка при поиске запроса на участие requestId: {}", requestId);
-            throw new ObjectNotFoundException("Ошибка при поиске события!");
+            throw new ErrorDataHandlingException("Ошибка при поиске события!");
         } else {
             return requestOptional.get();
         }
@@ -110,7 +111,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
         if (!user.equals(event.getInitiator())) {
             log.error("Акцептовать заявки может только инициатор события! userid={}, eventId={}", userId, eventId);
-            throw new BadRequestException("Акцептовать заявки может только инициатор события!");
+            throw new ForbiddenActionException("Акцептовать заявки может только инициатор события!");
         }
         ParticipationRequest participationRequest = getPartRequest(reqId);
         if (!participationRequest.getEvent().getId().equals(eventId)) {
@@ -155,7 +156,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         Event event = eventService.getEventById(eventId);
         if (!user.equals(event.getInitiator())) {
             log.error("Отклонять заявки может только инициатор события! userid={}, eventId={}", userId, eventId);
-            throw new BadRequestException("Отклонять заявки может только инициатор события!");
+            throw new ForbiddenActionException("Отклонять заявки может только инициатор события!");
         }
         participationRequest.setStatus(RequestStatus.REJECTED);
         return ParticipationMapper.toParticipationRequestDto(partRequestRepository.save(participationRequest));

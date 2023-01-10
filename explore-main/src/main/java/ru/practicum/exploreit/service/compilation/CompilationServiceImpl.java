@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.exploreit.dto.CompilationDto;
 import ru.practicum.exploreit.dto.CompilationMapper;
 import ru.practicum.exploreit.exception.BadRequestException;
-import ru.practicum.exploreit.exception.ObjectNotFoundException;
+import ru.practicum.exploreit.exception.ErrorDataHandlingException;
 import ru.practicum.exploreit.extention.pagination.PaginationParams;
 import ru.practicum.exploreit.model.Compilation;
 import ru.practicum.exploreit.model.Event;
@@ -49,7 +49,7 @@ public class CompilationServiceImpl implements CompilationService {
         Optional<Compilation> compilationOptional = compilationRepository.findById(compId);
         if (compilationOptional.isEmpty()) {
             log.error("Ошибка при поиске подборки событий с compId: {}", compId);
-            throw new ObjectNotFoundException("Ошибка при поиске подборки событий!");
+            throw new ErrorDataHandlingException("Ошибка при поиске подборки событий!");
         } else {
             return compilationOptional.get();
         }
@@ -73,7 +73,7 @@ public class CompilationServiceImpl implements CompilationService {
         Set<Event> events = compilation.getEvents();
         if (!events.contains(event)) {
             log.error("Подборка с id {} не содержит события с id {}", compId, eventId);
-            throw new ObjectNotFoundException("Ошибка при поиске события в подборке событий!");
+            throw new ErrorDataHandlingException("Ошибка при поиске события в подборке событий!");
         }
         event.getCompilations().remove(compilation);
         events.remove(event);
