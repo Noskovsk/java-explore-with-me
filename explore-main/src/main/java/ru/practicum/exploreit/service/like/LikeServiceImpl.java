@@ -36,12 +36,22 @@ public class LikeServiceImpl {
             log.error("Нельзя отдавать лайк в неопубликованному событию! userid={}, eventId={}", userId, eventId);
             throw new BadRequestException("Нельзя отдавать лайк в неопубликованному событию!");
         }
-        Like like = Like.builder()
-                .event(event)
-                .user(user)
-                .isLike(isLike)
-                .build();
-        return likeRepository.save(like);
+        Optional<Like> optionalLike = likeRepository.findLikeByEventAndUser(event, user);
+        if (optionalLike.isEmpty()) {
+            return likeRepository.save(Like.builder()
+                    .event(event)
+                    .user(user)
+                    .isLike(isLike)
+                    .build());
+        } else {
+            if (optionalLike.get().isLike() == isLike) {
+                log.error("Нельзя повторно отдавать лайк событию! userid={}, eventId={}", userId, eventId);
+                throw new BadRequestException("Нельзя повторно отдавать лайк событию!");
+            } else {
+                optionalLike.get().setLike(isLike);
+                return  likeRepository.save(optionalLike.get());
+            }
+        }
     }
 
     public void deleteLike(Long userId, Long eventId) {
