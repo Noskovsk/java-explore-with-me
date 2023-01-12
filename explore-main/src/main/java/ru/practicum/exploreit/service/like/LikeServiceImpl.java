@@ -41,7 +41,6 @@ public class LikeServiceImpl {
                 .user(user)
                 .isLike(isLike)
                 .build();
-
         return likeRepository.save(like);
     }
 
