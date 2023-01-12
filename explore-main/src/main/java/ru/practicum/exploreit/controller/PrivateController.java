@@ -7,7 +7,9 @@ import ru.practicum.exploreit.dto.event.EventFullDto;
 import ru.practicum.exploreit.dto.event.EventNewDto;
 import ru.practicum.exploreit.dto.event.EventShortDto;
 import ru.practicum.exploreit.dto.event.EventUpdateDto;
+import ru.practicum.exploreit.model.Like;
 import ru.practicum.exploreit.service.event.EventService;
+import ru.practicum.exploreit.service.like.LikeServiceImpl;
 import ru.practicum.exploreit.service.participationrequest.ParticipationRequestServiceImpl;
 
 import javax.validation.Valid;
@@ -19,6 +21,11 @@ import java.util.List;
 public class PrivateController {
     private final EventService eventService;
     private final ParticipationRequestServiceImpl participationRequestService;
+    private final LikeServiceImpl likeService;
+
+    private final boolean like = true;
+    private final boolean dislike = false;
+
 
     @PostMapping("/events")
     public EventFullDto createEvent(@PathVariable Long userId, @RequestBody @Valid EventNewDto eventNewDto) {
@@ -77,4 +84,18 @@ public class PrivateController {
         return participationRequestService.cancelMyRequest(userId, requestId);
     }
 
+    @PutMapping("/like/{eventId}")
+    public Like likeEvent(@PathVariable Long userId, @PathVariable Long eventId) {
+        return likeService.likeOrDislikeEvent(userId, eventId, like);
+    }
+
+    @PutMapping("/dislike/{eventId}")
+    public Like dislikeEvent(@PathVariable Long userId, @PathVariable Long eventId) {
+        return likeService.likeOrDislikeEvent(userId, eventId, dislike);
+    }
+
+    @DeleteMapping("/like/{eventId}/delete")
+    public void deleteLike(@PathVariable Long userId, @PathVariable Long eventId) {
+        likeService.deleteLike(userId, eventId);
+    }
 }

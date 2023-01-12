@@ -97,3 +97,17 @@ CREATE TABLE IF NOT EXISTS event_and_compilations
     CONSTRAINT "fk_compil_compil_id" FOREIGN KEY (compilation_id)
         REFERENCES compilations (id)
 ) ^;
+
+CREATE TABLE IF NOT EXISTS likes
+(
+    like_id  BIGINT  NOT NULL,
+    event_id BIGINT  NOT NULL,
+    user_id  BIGINT  NOT NULL,
+    is_like  BOOLEAN NOT NULL,
+    CONSTRAINT "pk_like" PRIMARY KEY (like_id),
+    CONSTRAINT "fk_events_event_id" FOREIGN KEY (event_id)
+        REFERENCES events (id),
+    CONSTRAINT "fk_user_user_id" FOREIGN KEY (user_id)
+        REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT no_duplicate_likes UNIQUE (event_id, user_id)
+) ^;
