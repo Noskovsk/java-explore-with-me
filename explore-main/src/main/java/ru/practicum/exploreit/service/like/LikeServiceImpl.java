@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.exploreit.exception.BadRequestException;
-import ru.practicum.exploreit.exception.ObjectNotFoundException;
+import ru.practicum.exploreit.exception.ErrorDataHandlingException;
 import ru.practicum.exploreit.model.Event;
 import ru.practicum.exploreit.model.EventStatus;
 import ru.practicum.exploreit.model.Like;
@@ -66,7 +66,7 @@ public class LikeServiceImpl {
         Optional<Like> optionalLike = likeRepository.findLikeByEventAndUser(event, user);
         if (optionalLike.isEmpty()) {
             log.error("Ошибка при поиске лайка события eventId = {}, от пользователя с id = {}", eventId, userId);
-            throw new ObjectNotFoundException("Ошибка при поиске лайка события!");
+            throw new ErrorDataHandlingException("Ошибка при поиске лайка события!");
         } else {
             return optionalLike.get();
         }
