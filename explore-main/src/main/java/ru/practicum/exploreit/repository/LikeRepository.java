@@ -6,9 +6,11 @@ import ru.practicum.exploreit.model.Event;
 import ru.practicum.exploreit.model.Like;
 import ru.practicum.exploreit.model.User;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface LikeRepository extends JpaRepository<Like, Long> {
     Optional<Like> findLikeByEventAndUser(Event event, User user);
+    List<Like> findAllByEvent(Event event);
 }

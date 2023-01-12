@@ -13,12 +13,14 @@ import ru.practicum.exploreit.extention.pagination.PaginationParams;
 import ru.practicum.exploreit.model.*;
 import ru.practicum.exploreit.repository.EventRepository;
 import ru.practicum.exploreit.service.category.CategoryService;
+import ru.practicum.exploreit.service.like.LikeServiceImpl;
 import ru.practicum.exploreit.service.location.LocationService;
 import ru.practicum.exploreit.service.participationrequest.ParticipationRequestService;
 import ru.practicum.exploreit.service.user.UserService;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,18 +36,22 @@ public class EventServiceImpl implements EventService {
     private final LocationService locationService;
     private final ParticipationRequestService participationRequestService;
     private final EndpointStatClient endpointStatClient;
+    private final LikeServiceImpl likeService;
 
     public EventServiceImpl(EventRepository eventRepository,
                             UserService userService,
                             CategoryService categoryService,
                             LocationService locationService,
-                            @Lazy ParticipationRequestService participationRequestService, EndpointStatClient endpointHitClient, EndpointStatClient endpointStatClient) {
+                            @Lazy ParticipationRequestService participationRequestService,
+                            EndpointStatClient endpointStatClient,
+                            @Lazy LikeServiceImpl likeService) {
         this.eventRepository = eventRepository;
         this.userService = userService;
         this.categoryService = categoryService;
         this.locationService = locationService;
         this.participationRequestService = participationRequestService;
         this.endpointStatClient = endpointStatClient;
+        this.likeService = likeService;
     }
 
     @Override
@@ -121,6 +127,7 @@ public class EventServiceImpl implements EventService {
         EventFullDto eventFullDto = EventMapper.toFullEvent(event);
         eventFullDto.setConfirmedRequests(Long.valueOf(participationRequestService.getConfirmedRequestOfEvent(event).size()));
         eventFullDto.setViews(endpointStatClient.getHitsCount(event.getId()));
+        eventFullDto.setRating(likeService.getRatingByEvent(event));
         return EventMapper.toFullEvent(event);
     }
 
@@ -257,9 +264,6 @@ public class EventServiceImpl implements EventService {
                         "text = {}, categories = {}, paid = {}, rangeStart = {}, rangeEnd = {}, onlyAvailable = {}, sort = {}",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort);
         List<Category> categoryList = categories == null ? null : categoryService.getCategoryListById(categories);
-        if (sort != null) {
-            SortParam sortOrder = stringToSortParam(sort);
-        }
         PageRequest pageRequest = PaginationParams.createPageRequest(from, size);
         List<EventFullDto> eventFullDtoList = eventRepository.findEventByFilter(text,
                 categoryList,
@@ -269,6 +273,18 @@ public class EventServiceImpl implements EventService {
                 pageRequest).stream().map(e -> EventMapper.toFullEvent(e)).collect(Collectors.toList());
         if (onlyAvailable != null && onlyAvailable) {
             eventFullDtoList.removeIf(e -> (e.getParticipantLimit() > 0 && e.getConfirmedRequests() >= e.getParticipantLimit()));
+        }
+        if (sort != null) {
+            SortParam sortParam = stringToSortParam(sort);
+            switch (sortParam) {
+                case EVENT_DATE:
+                    eventFullDtoList.sort(EventFullDto::compareTo);
+                    break;
+                case VIEWS:
+                    eventFullDtoList.sort(Comparator.comparingLong(e -> e.getViews()));
+                case RATING:
+                    eventFullDtoList.sort(Comparator.comparingLong(e -> e.getRating()));
+            }
         }
         endpointStatClient.sendHit(uri, ip);
         return eventFullDtoList;

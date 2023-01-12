@@ -13,6 +13,7 @@ import ru.practicum.exploreit.repository.LikeRepository;
 import ru.practicum.exploreit.service.event.EventService;
 import ru.practicum.exploreit.service.user.UserService;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -60,5 +61,14 @@ public class LikeServiceImpl {
         } else {
             return optionalLike.get();
         }
+    }
+
+    public Long getRatingByEvent(Event event) {
+        List<Like> likeList = likeRepository.findAllByEvent(event);
+        long rating = 0L;
+        for (Like like : likeList) {
+            rating = rating + (like.isLike() ? 1L : -1L);
+        }
+        return rating;
     }
 }
