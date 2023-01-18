@@ -18,6 +18,7 @@ import ru.practicum.exploreit.service.location.LocationService;
 import ru.practicum.exploreit.service.participationrequest.ParticipationRequestService;
 import ru.practicum.exploreit.service.user.UserService;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Transactional
 public class EventServiceImpl implements EventService {
     private static final LocalDateTime startSearch = LocalDateTime.of(2020, 01, 01, 00, 00);
     private static final LocalDateTime endSearch = LocalDateTime.of(2099, 01, 01, 00, 00);

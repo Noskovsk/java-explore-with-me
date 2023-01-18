@@ -13,12 +13,14 @@ import ru.practicum.exploreit.repository.LikeRepository;
 import ru.practicum.exploreit.service.event.EventService;
 import ru.practicum.exploreit.service.user.UserService;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Service
 @AllArgsConstructor
+@Transactional
 public class LikeServiceImpl {
     private final EventService eventService;
     private final UserService userService;

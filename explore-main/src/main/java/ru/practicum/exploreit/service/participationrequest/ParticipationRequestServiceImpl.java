@@ -13,6 +13,7 @@ import ru.practicum.exploreit.repository.PartRequestRepository;
 import ru.practicum.exploreit.service.event.EventService;
 import ru.practicum.exploreit.service.user.UserService;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
+@Transactional
 public class ParticipationRequestServiceImpl implements ParticipationRequestService {
     private final PartRequestRepository partRequestRepository;
     private final EventService eventService;
