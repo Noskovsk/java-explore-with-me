@@ -53,9 +53,10 @@ public class EventFullDto implements Comparable<EventFullDto> {
     public int compareTo(EventFullDto o) {
         if (this.getEventDate() == null) {
             return 1;
-        }if (o.getEventDate() == null) {
+        }
+        if (o.getEventDate() == null) {
             return -1;
-        } else{
+        } else {
             return (this.getEventDate().isBefore(o.getEventDate()) ? -1 : 1);
         }
     }
