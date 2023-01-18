@@ -12,5 +12,6 @@ import java.util.Optional;
 @Repository
 public interface LikeRepository extends JpaRepository<Like, Long> {
     Optional<Like> findLikeByEventAndUser(Event event, User user);
+
     List<Like> findAllByEvent(Event event);
 }
