@@ -23,10 +23,6 @@ public class PrivateController {
     private final ParticipationRequestServiceImpl participationRequestService;
     private final LikeServiceImpl likeService;
 
-    private final boolean like = true;
-    private final boolean dislike = false;
-
-
     @PostMapping("/events")
     public EventFullDto createEvent(@PathVariable Long userId, @RequestBody @Valid EventNewDto eventNewDto) {
         return eventService.createEvent(userId, eventNewDto);
@@ -86,12 +82,12 @@ public class PrivateController {
 
     @PutMapping("/like/{eventId}")
     public Like likeEvent(@PathVariable Long userId, @PathVariable Long eventId) {
-        return likeService.likeOrDislikeEvent(userId, eventId, like);
+        return likeService.likeOrDislikeEvent(userId, eventId, true);
     }
 
     @PutMapping("/dislike/{eventId}")
     public Like dislikeEvent(@PathVariable Long userId, @PathVariable Long eventId) {
-        return likeService.likeOrDislikeEvent(userId, eventId, dislike);
+        return likeService.likeOrDislikeEvent(userId, eventId, false);
     }
 
     @DeleteMapping("/like/{eventId}/delete")
