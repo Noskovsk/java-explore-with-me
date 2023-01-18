@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 import ru.practicum.exploreit.model.Location;
 import ru.practicum.exploreit.repository.LocationRepository;
 
+import javax.transaction.Transactional;
+
 @Slf4j
 @Service
 @AllArgsConstructor
+@Transactional
 public class LocationServiceImpl implements LocationService {
     private final LocationRepository locationRepository;
 

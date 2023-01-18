@@ -14,6 +14,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -69,4 +70,7 @@ public class Event {
     @ManyToMany(mappedBy = "events")
     @JsonBackReference
     private Set<Compilation> compilations;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "event")
+    @JsonBackReference
+    private List<Like> likeList;
 }

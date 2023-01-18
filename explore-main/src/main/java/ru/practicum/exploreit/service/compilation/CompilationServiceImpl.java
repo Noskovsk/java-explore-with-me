@@ -14,6 +14,7 @@ import ru.practicum.exploreit.model.Event;
 import ru.practicum.exploreit.repository.CompilationRepository;
 import ru.practicum.exploreit.service.event.EventService;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
+@Transactional
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventService eventService;

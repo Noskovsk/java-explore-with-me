@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
         name = "pgsql_enum",
         typeClass = PostgreSQLEnumType.class
 )
-public class EventFullDto {
+public class EventFullDto implements Comparable<EventFullDto> {
     private Long id;
     private String title;
     private String annotation;
@@ -47,4 +47,17 @@ public class EventFullDto {
     private EventStatus state;
     private Long views;
     private Long confirmedRequests;
+    private Long rating;
+
+    @Override
+    public int compareTo(EventFullDto o) {
+        if (this.getEventDate() == null) {
+            return 1;
+        }
+        if (o.getEventDate() == null) {
+            return -1;
+        } else {
+            return (this.getEventDate().isBefore(o.getEventDate()) ? -1 : 1);
+        }
+    }
 }

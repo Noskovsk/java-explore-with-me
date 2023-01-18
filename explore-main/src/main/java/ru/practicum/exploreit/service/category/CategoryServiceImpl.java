@@ -9,12 +9,14 @@ import ru.practicum.exploreit.extention.pagination.PaginationParams;
 import ru.practicum.exploreit.model.Category;
 import ru.practicum.exploreit.repository.CategoryRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Service
 @AllArgsConstructor
+@Transactional
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
